@@ -38,6 +38,6 @@ if [ "${monitor_file}" = "disable" ]; then
       $SCRIPT_DIR/iptables.sh disable
     fi
     $SCRIPT_DIR/service.sh stop
-    update_description "🔴module is disabled"
+    update_description "🔴module is stopped"
   fi
 fi

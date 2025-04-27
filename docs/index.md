@@ -81,7 +81,7 @@ dns:
   ipv6: true
 
   default-nameserver:
-    - 127.0.0.1:5591
+    - 127.0.0.1:5591 # not necessary
 
   listen: 0.0.0.0:1053
   use-hosts: true
@@ -91,7 +91,7 @@ dns:
     - '*.lan'
 
   nameserver:
-    - 127.0.0.1:5591
+    - 127.0.0.1:5591 # necessary
 ```
 
 ---

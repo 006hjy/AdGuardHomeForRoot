@@ -1,7 +1,7 @@
 id=AdGuardHome
 name=AdGuardHome for Root
-version=20250419
-versionCode=34
+version=20250427
+versionCode=35
 author=twoone3
-description=[unkown] filter ads at the DNS level
+description=[state] filter ads at the DNS level
 updateJson=https://raw.githubusercontent.com/twoone-3/AdGuardHomeForRoot/main/version.json
