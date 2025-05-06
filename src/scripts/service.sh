@@ -1,10 +1,10 @@
 #!/system/bin/sh
 
-AGH_DIR="/data/adb/agh"
+AGH_DIR=""
 BIN_DIR="$AGH_DIR/bin"
 SCRIPT_DIR="$AGH_DIR/scripts"
 PID_FILE="$AGH_DIR/bin/agh_pid"
-source "$AGH_DIR/scripts/config.sh"
+source "/data/adb/agh/scripts/config.sh"
 
 exec >>$AGH_DIR/agh.log 2>&1
 
