@@ -18,19 +18,19 @@ find_packages_uid() {
 }
 
 enable_iptables() {
-  ${iptables_w} -t nat -N ADGUARD
+  ${iptables_w} -t nat -N ADGUARD_DNS
   # return requests from AdGuardHome
-  ${iptables_w} -t nat -A ADGUARD -m owner --uid-owner $adg_user --gid-owner $adg_group -j RETURN
+  ${iptables_w} -t nat -A ADGUARD_DNS -m owner --uid-owner $adg_user --gid-owner $adg_group -j RETURN
   # return requests from ignore_dest_list
   if [ $ignore_dest_list ]; then
     for subnet in ${ignore_dest_list[@]}; do
-      ${iptables_w} -t nat -A ADGUARD -d $subnet -j RETURN
+      ${iptables_w} -t nat -A ADGUARD_DNS -d $subnet -j RETURN
     done
   fi
   # return requests from ignore_src_list
   if [ $ignore_src_list ]; then
     for subnet in ${ignore_src_list[@]}; do
-      ${iptables_w} -t nat -A ADGUARD -s $subnet -j RETURN
+      ${iptables_w} -t nat -A ADGUARD_DNS -s $subnet -j RETURN
     done
   fi
   # return requests from bypassed apps
@@ -38,29 +38,29 @@ enable_iptables() {
     find_packages_uid
     if [ ${#uid_list[@]} -ne 0 ]; then
       for uid in "${uid_list[@]}"; do
-        ${iptables_w} -t nat -A ADGUARD -m owner --uid-owner $uid -j RETURN
+        ${iptables_w} -t nat -A ADGUARD_DNS -m owner --uid-owner $uid -j RETURN
       done
     fi
     # redirect DNS requests to AdGuardHome
-    ${iptables_w} -t nat -A ADGUARD -p udp --dport 53 -j REDIRECT --to-ports $redir_port
-    ${iptables_w} -t nat -A ADGUARD -p tcp --dport 53 -j REDIRECT --to-ports $redir_port
+    ${iptables_w} -t nat -A ADGUARD_DNS -p udp --dport 53 -j REDIRECT --to-ports $redir_port
+    ${iptables_w} -t nat -A ADGUARD_DNS -p tcp --dport 53 -j REDIRECT --to-ports $redir_port
   else
     if [ ${#uid_list[@]} -ne 0 ]; then
       for uid in "${uid_list[@]}"; do
-        ${iptables_w} -t nat -A ADGUARD -p udp --dport 53 -m owner --uid-owner $uid -j REDIRECT --to-ports $redir_port
-        ${iptables_w} -t nat -A ADGUARD -p tcp --dport 53 -m owner --uid-owner $uid -j REDIRECT --to-ports $redir_port
+        ${iptables_w} -t nat -A ADGUARD_DNS -p udp --dport 53 -m owner --uid-owner $uid -j REDIRECT --to-ports $redir_port
+        ${iptables_w} -t nat -A ADGUARD_DNS -p tcp --dport 53 -m owner --uid-owner $uid -j REDIRECT --to-ports $redir_port
       done
     fi
-    ${iptables_w} -t nat -A ADGUARD -j RETURN
+    ${iptables_w} -t nat -A ADGUARD_DNS -j RETURN
   fi
   # apply iptables rules
-  ${iptables_w} -t nat -I OUTPUT -j ADGUARD
+  ${iptables_w} -t nat -I OUTPUT -j ADGUARD_DNS
 }
 
 disable_iptables() {
-  ${iptables_w} -t nat -D OUTPUT -j ADGUARD
-  ${iptables_w} -t nat -F ADGUARD
-  ${iptables_w} -t nat -X ADGUARD
+  ${iptables_w} -t nat -D OUTPUT -j ADGUARD_DNS
+  ${iptables_w} -t nat -F ADGUARD_DNS
+  ${iptables_w} -t nat -X ADGUARD_DNS
 }
 
 del_block_ipv6_dns() {
