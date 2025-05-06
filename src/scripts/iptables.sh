@@ -8,15 +8,6 @@ ip6tables_w="ip6tables -w 64"
 
 exec >>$AGH_DIR/agh.log 2>&1
 
-find_packages_uid() {
-  uid_list=()
-  for package in "${packages_list[@]}"; do
-    uid_list+=$(
-      busybox awk -v p="${package}" '$1~p{print $2}' "${system_packages_file}"
-    )
-  done
-}
-
 enable_iptables() {
   ${iptables_w} -t nat -N ADGUARD_DNS
   # return requests from AdGuardHome
@@ -33,26 +24,11 @@ enable_iptables() {
       ${iptables_w} -t nat -A ADGUARD_DNS -s $subnet -j RETURN
     done
   fi
-  # return requests from bypassed apps
-  if [ "$use_blacklist" = true ]; then
-    find_packages_uid
-    if [ ${#uid_list[@]} -ne 0 ]; then
-      for uid in "${uid_list[@]}"; do
-        ${iptables_w} -t nat -A ADGUARD_DNS -m owner --uid-owner $uid -j RETURN
-      done
-    fi
-    # redirect DNS requests to AdGuardHome
-    ${iptables_w} -t nat -A ADGUARD_DNS -p udp --dport 53 -j REDIRECT --to-ports $redir_port
-    ${iptables_w} -t nat -A ADGUARD_DNS -p tcp --dport 53 -j REDIRECT --to-ports $redir_port
-  else
-    if [ ${#uid_list[@]} -ne 0 ]; then
-      for uid in "${uid_list[@]}"; do
-        ${iptables_w} -t nat -A ADGUARD_DNS -p udp --dport 53 -m owner --uid-owner $uid -j REDIRECT --to-ports $redir_port
-        ${iptables_w} -t nat -A ADGUARD_DNS -p tcp --dport 53 -m owner --uid-owner $uid -j REDIRECT --to-ports $redir_port
-      done
-    fi
-    ${iptables_w} -t nat -A ADGUARD_DNS -j RETURN
-  fi
+
+  # redirect DNS requests to AdGuardHome
+  ${iptables_w} -t nat -A ADGUARD_DNS -p udp --dport 53 -j REDIRECT --to-ports $redir_port
+  ${iptables_w} -t nat -A ADGUARD_DNS -p tcp --dport 53 -j REDIRECT --to-ports $redir_port
+
   # apply iptables rules
   ${iptables_w} -t nat -I OUTPUT -j ADGUARD_DNS
 }

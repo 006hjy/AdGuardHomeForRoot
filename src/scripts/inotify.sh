@@ -1,6 +1,6 @@
-events="$1"
-monitor_dir="$2"
-monitor_file="$3"
+readonly EVENTS=$1
+readonly MONITOR_DIR=$2
+readonly MONITOR_FILE=$3
 
 AGH_DIR="/data/adb/agh"
 SCRIPT_DIR="$AGH_DIR/scripts"
@@ -13,8 +13,8 @@ update_description() {
   sed -i "s/description=\[.*\]/description=\[$1\]/" "$MOD_PATH/module.prop"
 }
 
-if [ "${monitor_file}" = "disable" ]; then
-  if [ "${events}" = "d" ]; then
+if [ "${MONITOR_FILE}" = "disable" ]; then
+  if [ "${EVENTS}" = "d" ]; then
     echo "trying to stop module"
     $SCRIPT_DIR/service.sh start
     if [ $? -ne 0 ]; then
@@ -33,7 +33,7 @@ if [ "${monitor_file}" = "disable" ]; then
       echo "iptables is disabled"
       update_description "🟢bin is running \& iptables is disabled"
     fi
-  elif [ "${events}" = "n" ]; then
+  elif [ "${EVENTS}" = "n" ]; then
     if [ "$enable_iptables" = true ]; then
       $SCRIPT_DIR/iptables.sh disable
     fi
