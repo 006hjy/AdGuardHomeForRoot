@@ -38,28 +38,27 @@ disable_iptables() {
   $iptables_w -t nat -X ADGUARD_DNS
 }
 
-del_block_ipv6_dns() {
-  $ip6tables_w -D OUTPUT -p udp --dport 53 -j DROP
-  $ip6tables_w -D OUTPUT -p tcp --dport 53 -j DROP
+add_block_ipv6_dns() {
+  $ip6tables_w -t filter -N ADGUARD_BLOCK_DNS
+  $ip6tables_w -t filter -A ADGUARD_BLOCK_DNS -p udp --dport 53 -j DROP
+  $ip6tables_w -t filter -A ADGUARD_BLOCK_DNS -p tcp --dport 53 -j DROP
+  $ip6tables_w -t filter -I OUTPUT -j ADGUARD_BLOCK_DNS
 }
 
-add_block_ipv6_dns() {
-  $ip6tables_w -A OUTPUT -p udp --dport 53 -j DROP
-  $ip6tables_w -A OUTPUT -p tcp --dport 53 -j DROP
+del_block_ipv6_dns() {
+  $ip6tables_w -t filter -F ADGUARD_BLOCK_DNS
+  $ip6tables_w -t filter -D OUTPUT -j ADGUARD_BLOCK_DNS
+  $ip6tables_w -t filter -X ADGUARD_BLOCK_DNS
 }
 
 case "$1" in
 enable)
   enable_iptables
-  if [ "$block_ipv6_dns" = true ]; then
-    add_block_ipv6_dns
-  fi
+  [ "$block_ipv6_dns" = true ] && add_block_ipv6_dns
   ;;
 disable)
   disable_iptables
-  if [ "$block_ipv6_dns" = true ]; then
-    del_block_ipv6_dns
-  fi
+  del_block_ipv6_dns
   ;;
 *)
   echo "Usage: $0 {enable|disable}"

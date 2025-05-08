@@ -5,7 +5,7 @@
     sleep 12
   done
 
-  /data/adb/agh/scripts/start.sh 
+  /data/adb/agh/scripts/tool.sh start
 
   inotifyd /data/adb/agh/sctipts/inotify.sh /data/adb/modules/AdGuardHome:d,n &
 ) &
