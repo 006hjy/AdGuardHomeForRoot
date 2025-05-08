@@ -106,7 +106,7 @@ dns:
 模块的配置文件也分为两部分：
 
 - **`/data/adb/agh/bin/AdGuardHome.yaml`**：AdGuardHome 的主配置文件。
-- **`/data/adb/agh/script/config.sh`**：模块的配置文件，具体说明请参考文件内的注释。
+- **`/data/adb/agh/settings.conf`**：模块的配置文件，具体说明请参考文件内的注释。
 
 在更新模块时，用户可以选择是否保留原有的配置文件。如果选择不保留，系统会自动将原配置文件备份到 **`/data/adb/agh/backup`** 目录，以确保数据安全。
 
@@ -158,7 +158,7 @@ dns:
 
 **A:**  
 
-- 编辑 **`/data/adb/agh/script/config.sh`** 文件。  
+- 编辑 **`/data/adb/agh/settings.conf`** 文件。  
 - 将 `ENABLE_IPTABLES` 参数设置为 `false`。  
 - 保存文件后，重启模块。
 

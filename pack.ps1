@@ -66,22 +66,30 @@ if (Test-Path -Path $OutputPathArm64) {
 if (Test-Path -Path $OutputPathArmv7) {
   Remove-Item -Path $OutputPathArmv7
 }
+
+# 设置项目根目录
+$ProjectRoot = "$PSScriptRoot\src"
+
 # pack arm64
-& $7z a -tzip $OutputPathArm64 "*.sh"
-& $7z a -tzip $OutputPathArm64 "module.prop"
-& $7z a -tzip $OutputPathArm64 "META-INF"
-& $7z a -tzip $OutputPathArm64 "scripts"
-& $7z a -tzip $OutputPathArm64 "webroot"
-& $7z a -tzip $OutputPathArm64 "bin/"
-& $7z a -tzip $OutputPathArm64 "./cache/arm64/AdGuardHome/AdGuardHome"
+& $7z a -tzip $OutputPathArm64 "$ProjectRoot\*.sh"
+& $7z a -tzip $OutputPathArm64 "$ProjectRoot\settings.conf"
+& $7z a -tzip $OutputPathArm64 "$ProjectRoot\module.prop"
+& $7z a -tzip $OutputPathArm64 "$ProjectRoot\META-INF"
+& $7z a -tzip $OutputPathArm64 "$ProjectRoot\scripts"
+& $7z a -tzip $OutputPathArm64 "$ProjectRoot\webroot"
+& $7z a -tzip $OutputPathArm64 "$ProjectRoot\bin\"
+& $7z a -tzip $OutputPathArm64 "$CacheDir\arm64\AdGuardHome\AdGuardHome"
 & $7z rn $OutputPathArm64 "AdGuardHome" "bin/AdGuardHome"
+
 # pack armv7
-& $7z a -tzip $OutputPathArmv7 "*.sh"
-& $7z a -tzip $OutputPathArmv7 "module.prop"
-& $7z a -tzip $OutputPathArmv7 "META-INF"
-& $7z a -tzip $OutputPathArmv7 "scripts"
-& $7z a -tzip $OutputPathArmv7 "webroot"
-& $7z a -tzip $OutputPathArmv7 "bin/"
-& $7z a -tzip $OutputPathArmv7 "./cache/armv7/AdGuardHome/AdGuardHome"
+& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\*.sh"
+& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\settings.conf"
+& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\module.prop"
+& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\META-INF"
+& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\scripts"
+& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\webroot"
+& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\bin\"
+& $7z a -tzip $OutputPathArmv7 "$CacheDir\armv7\AdGuardHome\AdGuardHome"
 & $7z rn $OutputPathArmv7 "AdGuardHome" "bin/AdGuardHome"
+
 Write-Host "Packing completed successfully."
