@@ -2,8 +2,7 @@
 
 source "/data/adb/agh/settings.conf"
 
-case "$1" in
-start)
+start_adguardhome() {
   # check if AdGuardHome is already running
   if [ -f "$PID_FILE" ] && ps -p $(cat "$PID_FILE") >/dev/null 2>&1; then
     log "AdGuardHome is already running" "- AdGuardHome 已经在运行"
@@ -17,25 +16,38 @@ start)
 
   # check if AdGuardHome started successfully
   if ps -p "$adg_pid" -o comm= | grep -q "^AdGuardHome$"; then
-    log "AdGuardHome started" "- AdGuardHome 启动成功"
+    log "AdGuardHome started, PID: $adg_pid" "- AdGuardHome 启动成功，PID: $adg_pid"
+    update_description "✅ Started 🚀" "✅ 启动成功 🚀"
     echo "$adg_pid" >"$PID_FILE"
     if [ "$enable_iptables" = true ]; then
       $SCRIPT_DIR/iptables.sh enable
     fi
   else
     log "Failed to start AdGuardHome" "- AdGuardHome 启动失败"
+    update_description "❌ Failed to start" "❌ 启动失败"
     exit 1
   fi
-  ;;
-stop)
+}
+
+stop_adguardhome() {
   if [ ! -f "$PID_FILE" ]; then
-    log "pid file not found" "- 未找到pid文件"
-    exit 1
+    log "AdGuardHome is not running" "- AdGuardHome 没有运行"
+    exit 0
   fi
   log "Stopping AdGuardHome" "- 停止 AdGuardHome"
   kill $(cat "$PID_FILE") || kill -9 $(cat "$PID_FILE")
   rm "$PID_FILE"
   $SCRIPT_DIR/iptables.sh disable
+  update_description "❌ Stopped" "❌ 已停止"
+  log "AdGuardHome stopped" "- AdGuardHome 已停止"
+}
+
+case "$1" in
+start)
+  start_adguardhome
+  ;;
+stop)
+  stop_adguardhome
   ;;
 *)
   echo "Usage: $0 {start|stop}"

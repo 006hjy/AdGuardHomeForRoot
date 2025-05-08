@@ -8,5 +8,5 @@ else
   $SCRIPT_DIR/tool.sh start
 fi
 
-echo "Waiting for 1 second..."
+log "Waiting for 1 second to exit..." "- 等待 1 秒钟退出..."
 sleep 1
