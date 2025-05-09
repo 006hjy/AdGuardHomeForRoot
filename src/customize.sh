@@ -1,5 +1,3 @@
-#!/system/bin/sh
-
 SKIPUNZIP=1
 
 language=$(getprop persist.sys.locale || getprop ro.product.locale | grep -q '^en' && echo en || echo zh)

@@ -1,5 +1,3 @@
-#!/system/bin/sh
-
 source "/data/adb/agh/settings.conf"
 
 if [ -f "$PID_FILE" ]; then

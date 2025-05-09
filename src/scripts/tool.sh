@@ -1,5 +1,3 @@
-#!/system/bin/sh
-
 source "/data/adb/agh/settings.conf"
 
 start_adguardhome() {
