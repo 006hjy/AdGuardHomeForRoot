@@ -1,4 +1,4 @@
-source "/data/adb/agh/settings.conf"
+. /data/adb/agh/settings.conf
 
 if [ -f "$PID_FILE" ]; then
   $SCRIPT_DIR/tool.sh stop

@@ -38,9 +38,7 @@ extract_keep_config() {
 }
 
 extract_no_config() {
-  if [ -d "$BACKUP_DIR" ]; then
-    rm -r "$BACKUP_DIR"
-  fi
+  [ -d "$BACKUP_DIR" ] && rm -r "$BACKUP_DIR"
   mkdir -p "$BACKUP_DIR"
   info "- Backing up old configuration files..." "- 正在备份旧配置文件..."
   mv "$AGH_DIR/settings.conf" "$BACKUP_DIR"
@@ -77,12 +75,10 @@ first_install_extract() {
 }
 
 if [ -d "$AGH_DIR" ]; then
-  if [ -f "$PID_FILE" ]; then
-    info "- Found running AdGuardHome process, stopping..." "- 发现正在运行的 AdGuardHome 进程，正在停止..."
-    kill $(cat "$PID_FILE") || kill -9 $(cat "$PID_FILE")
-    rm "$PID_FILE"
-    sleep 1
-  fi
+  # Kill all processes named AdGuardHome
+  info "- Stopping all AdGuardHome processes..." "- 正在停止所有 AdGuardHome 进程..."
+  pkill -f "AdGuardHome" || pkill -9 -f "AdGuardHome"
+  sleep 1
   info "- Found old version, do you want to keep the old configuration? (If not, it will be automatically backed up)" "- 发现旧版模块，是否保留原来的配置文件？（若不保留则自动备份）"
   info "- (Volume Up = Yes, Volume Down = No, 10s no input = No)" "- （音量上键 = 是, 音量下键 = 否，10秒无操作 = 否）"
   START_TIME=$(date +%s)

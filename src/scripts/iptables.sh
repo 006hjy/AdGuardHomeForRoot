@@ -1,4 +1,4 @@
-source "/data/adb/agh/settings.conf"
+. /data/adb/agh/settings.conf
 iptables_w="iptables -w 64"
 ip6tables_w="ip6tables -w 64"
 

@@ -1,19 +1,19 @@
-source "/data/adb/agh/settings.conf"
+. /data/adb/agh/settings.conf
 
 start_adguardhome() {
   # check if AdGuardHome is already running
-  if [ -f "$PID_FILE" ] && ps -p $(cat "$PID_FILE") >/dev/null 2>&1; then
+  if [ -f "$PID_FILE" ] && ps | grep -w "$adg_pid" | grep -q "AdGuardHome"; then
     log "AdGuardHome is already running" "- AdGuardHome 已经在运行"
     exit 0
   fi
 
   # to fix https://github.com/AdguardTeam/AdGuardHome/issues/7002
   export SSL_CERT_DIR="/system/etc/security/cacerts/"
-  busybox setuidgid "$adg_user:$adg_group" "$BIN_DIR/AdGuardHome" --logfile "$BIN_DIR/AdGuardHome.log" &
+  busybox setuidgid "$adg_user:$adg_group" "$BIN_DIR/AdGuardHome" >>"$AGH_DIR/bin.log" 2>&1 &
   adg_pid=$!
 
   # check if AdGuardHome started successfully
-  if ps -p "$adg_pid" -o comm= | grep -q "^AdGuardHome$"; then
+  if ps | grep -w "$adg_pid" | grep -q "AdGuardHome"; then
     log "AdGuardHome started, PID: $adg_pid" "- AdGuardHome 启动成功，PID: $adg_pid"
     update_description "✅ Started 🚀" "✅ 启动成功 🚀"
     echo "$adg_pid" >"$PID_FILE"
