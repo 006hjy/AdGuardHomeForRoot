@@ -1,7 +1,7 @@
 id=AdGuardHome
 name=AdGuardHome for Root
-version=20250509(preview)
-versionCode=35
+version=20250511
+versionCode=36
 author=twoone3
-description=Active
+description=none
 updateJson=https://raw.githubusercontent.com/twoone-3/AdGuardHomeForRoot/main/version.json

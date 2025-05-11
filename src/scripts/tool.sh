@@ -14,15 +14,19 @@ start_adguardhome() {
 
   # check if AdGuardHome started successfully
   if ps | grep -w "$adg_pid" | grep -q "AdGuardHome"; then
-    log "AdGuardHome started, PID: $adg_pid" "- AdGuardHome 启动成功，PID: $adg_pid"
-    update_description "✅ Started 🚀" "✅ 启动成功 🚀"
+    log "🥰 started, PID: $adg_pid" "- 🥰 启动成功，PID: $adg_pid"
+    update_description "🥰 Started, PID: $adg_pid" "🥰 启动成功, PID: $adg_pid"
     echo "$adg_pid" >"$PID_FILE"
     if [ "$enable_iptables" = true ]; then
       $SCRIPT_DIR/iptables.sh enable
     fi
   else
-    log "Failed to start AdGuardHome" "- AdGuardHome 启动失败"
-    update_description "❌ Failed to start" "❌ 启动失败"
+    log "😭 Error occurred, check logs for details" "😭 出现错误，请检查日志以获取详细信息"
+    update_description "😭 Error occurred, check logs for details" "😭 出现错误，请检查日志以获取详细信息"
+    log "==== Last 20 lines of bin.log ====" "==== bin.log 的最后 20 行 ===="
+    tail -n 20 "$AGH_DIR/bin.log" | while read -r line; do
+      log "$line" "$line"
+    done
     exit 1
   fi
 }

@@ -73,27 +73,6 @@ rm /data/adb/modules/AdGuardHome/disable
 
 如果使用代理模块，强烈建议禁用模块的 iptables 转发规则。禁用后，模块仅运行 AdGuardHome 本身。随后，将代理模块的上游 DNS 服务器配置为 `127.0.0.1:5591`，即可确保代理软件的所有 DNS 查询通过 AdGuardHome 进行广告屏蔽。
 
-以下是 Mihomo 的配置示例：
-
-```yaml
-dns:
-  enable: true
-  ipv6: true
-
-  default-nameserver:
-    - 127.0.0.1:5591 # not necessary
-
-  listen: 0.0.0.0:1053
-  use-hosts: true
-  enhanced-mode: fake-ip
-  fake-ip-range: 198.18.0.1/16
-  fake-ip-filter:
-    - '*.lan'
-
-  nameserver:
-    - 127.0.0.1:5591 # necessary
-```
-
 ---
 
 ### 模块目录与配置文件
