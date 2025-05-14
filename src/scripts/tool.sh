@@ -9,6 +9,9 @@ start_adguardhome() {
 
   # to fix https://github.com/AdguardTeam/AdGuardHome/issues/7002
   export SSL_CERT_DIR="/system/etc/security/cacerts/"
+  # set timezone to Shanghai
+  export TZ="Asia/Shanghai"
+  # run binary
   busybox setuidgid "$adg_user:$adg_group" "$BIN_DIR/AdGuardHome" >>"$AGH_DIR/bin.log" 2>&1 &
   adg_pid=$!
 
@@ -23,10 +26,7 @@ start_adguardhome() {
   else
     log "😭 Error occurred, check logs for details" "😭 出现错误，请检查日志以获取详细信息"
     update_description "😭 Error occurred, check logs for details" "😭 出现错误，请检查日志以获取详细信息"
-    log "==== Last 20 lines of bin.log ====" "==== bin.log 的最后 20 行 ===="
-    tail -n 20 "$AGH_DIR/bin.log" | while read -r line; do
-      log "$line" "$line"
-    done
+    $SCRIPT_DIR/debug.sh
     exit 1
   fi
 }

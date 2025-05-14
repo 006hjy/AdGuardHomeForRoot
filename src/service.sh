@@ -1,5 +1,5 @@
 until [ $(getprop init.svc.bootanim) = "stopped" ]; do
-  sleep 5
+  sleep 12
 done
 
 /data/adb/agh/scripts/tool.sh start
