@@ -1,6 +1,15 @@
 SKIPUNZIP=1
 
-language=$(getprop persist.sys.locale || getprop ro.product.locale | grep -q '^en' && echo en || echo zh)
+# most of the users are Chinese, so set default language to Chinese
+language="zh"
+
+# try to get the system language
+locale=$(getprop persist.sys.locale || getprop ro.product.locale || getprop persist.sys.language)
+
+# if the system language is English, set language to English
+if echo "$locale" | grep -qi "en"; then
+  language="en"
+fi
 
 function info() {
   [ "$language" = "en" ] && ui_print "$1" || ui_print "$2"

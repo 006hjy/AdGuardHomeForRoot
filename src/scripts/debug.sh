@@ -15,10 +15,35 @@ LOG="$AGH_DIR/debug.log"
   echo "Architecture: $(uname -m)"
   echo
 
-  echo "== Magisk Info =="
-  [ -f /sbin/magisk ] && /sbin/magisk -v 2>/dev/null
-  echo "Magisk Path: $(magisk --path 2>/dev/null)"
+  echo "== AdGuardHome Version =="
+  if [ -f "$AGH_DIR/bin/AdGuardHome" ]; then
+    "$AGH_DIR/bin/AdGuardHome" version
+  else
+    echo "AdGuardHome binary not found"
+  fi
   echo
+
+  echo "== Root Method =="
+  if [ -d "/data/adb/magisk" ]; then
+    echo "Magisk"
+  elif [ -d "/data/adb/ksu" ]; then
+    echo "KernelSU"
+  elif [ -d "/data/adb/ap" ]; then
+    echo "APatch"
+  else
+    echo "Unknown"
+  fi
+  echo
+
+  echo "== BusyBox Version =="
+  [ -d "/data/adb/magisk" ] && export PATH="/data/adb/magisk:$PATH"
+  [ -d "/data/adb/ksu/bin" ] && export PATH="/data/adb/ksu/bin:$PATH"
+  [ -d "/data/adb/ap/bin" ] && export PATH="/data/adb/ap/bin:$PATH"
+  if command -v busybox >/dev/null 2>&1; then
+    busybox --version
+  else
+    echo "BusyBox not found"
+  fi
 
   echo "== AGH Directory Listing =="
   ls -lR "$AGH_DIR"
@@ -37,7 +62,7 @@ LOG="$AGH_DIR/debug.log"
   echo
 
   echo "== Running Processes (AdGuardHome) =="
-  ps | grep AdGuardHome
+  ps -A | grep AdGuardHome
   echo
 
   echo "== iptables -t nat -L -n -v =="
@@ -52,14 +77,6 @@ LOG="$AGH_DIR/debug.log"
   ip addr
   echo
 
-  echo "== Disk Usage =="
-  df -h
-  echo
-
-  echo "== SELinux Status =="
-  getenforce
-  echo
-
-} > "$LOG" 2>&1
+} >"$LOG" 2>&1
 
 echo "Debug info collected in $LOG"

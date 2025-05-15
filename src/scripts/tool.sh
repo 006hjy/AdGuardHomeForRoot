@@ -1,9 +1,10 @@
 . /data/adb/agh/settings.conf
+. /data/adb/agh/scripts/base.sh
 
 start_adguardhome() {
   # check if AdGuardHome is already running
   if [ -f "$PID_FILE" ] && ps | grep -w "$adg_pid" | grep -q "AdGuardHome"; then
-    log "AdGuardHome is already running" "- AdGuardHome 已经在运行"
+    log "AdGuardHome is already running" "AdGuardHome 已经在运行"
     exit 0
   fi
 
@@ -17,11 +18,15 @@ start_adguardhome() {
 
   # check if AdGuardHome started successfully
   if ps | grep -w "$adg_pid" | grep -q "AdGuardHome"; then
-    log "🥰 started, PID: $adg_pid" "- 🥰 启动成功，PID: $adg_pid"
-    update_description "🥰 Started, PID: $adg_pid" "🥰 启动成功, PID: $adg_pid"
+    log "🥰 started" "🥰 启动成功"
+    update_description "🥰 Started" "🥰 启动成功"
     echo "$adg_pid" >"$PID_FILE"
+    log "AdGuardHome PID: $adg_pid" "AdGuardHome PID: $adg_pid"
+    append_description " PID: $adg_pid" " PID: $adg_pid"
+    # check if iptables is enabled
     if [ "$enable_iptables" = true ]; then
       $SCRIPT_DIR/iptables.sh enable
+      append_description " enable_iptables: $enable_iptables" " enable_iptables: $enable_iptables"
     fi
   else
     log "😭 Error occurred, check logs for details" "😭 出现错误，请检查日志以获取详细信息"
@@ -32,16 +37,26 @@ start_adguardhome() {
 }
 
 stop_adguardhome() {
-  if [ ! -f "$PID_FILE" ]; then
-    log "AdGuardHome is not running" "- AdGuardHome 没有运行"
-    exit 0
+  if [ -f "$PID_FILE" ]; then
+    log "Killing AdGuardHome using PID: $(cat $PID_FILE)" "使用 PID 杀死 AdGuardHome: $(cat $PID_FILE)"
+    kill $(cat "$PID_FILE") || kill -9 $(cat "$PID_FILE")
+    rm "$PID_FILE"
+  else
+    log "Force killing AdGuardHome" "强制杀死 AdGuardHome"
+    pkill -f "AdGuardHome" || pkill -9 -f "AdGuardHome"
   fi
-  log "Stopping AdGuardHome" "- 停止 AdGuardHome"
-  kill $(cat "$PID_FILE") || kill -9 $(cat "$PID_FILE")
-  rm "$PID_FILE"
-  $SCRIPT_DIR/iptables.sh disable
   update_description "❌ Stopped" "❌ 已停止"
-  log "AdGuardHome stopped" "- AdGuardHome 已停止"
+  log "AdGuardHome stopped" "AdGuardHome 已停止"
+  $SCRIPT_DIR/iptables.sh disable
+  append_description " enable_iptables: $enable_iptables" " enable_iptables: $enable_iptables"
+}
+
+toggle_adguardhome() {
+  if [ -f "$PID_FILE" ] && ps | grep -w "$(cat $PID_FILE)" | grep -q "AdGuardHome"; then
+    stop_adguardhome
+  else
+    start_adguardhome
+  fi
 }
 
 case "$1" in
@@ -51,8 +66,11 @@ start)
 stop)
   stop_adguardhome
   ;;
+toggle)
+  toggle_adguardhome
+  ;;
 *)
-  echo "Usage: $0 {start|stop}"
+  echo "Usage: $0 {start|stop|toggle}"
   exit 1
   ;;
 esac
