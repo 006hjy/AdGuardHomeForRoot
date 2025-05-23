@@ -28,4 +28,5 @@ Follow our channel for the latest news, or join our group for discussion!
 - [AWAwenue Ads Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)
 - [AdguardHome_magisk](https://github.com/410154425/AdGuardHome_magisk)
 - [akashaProxy](https://github.com/ModuleList/akashaProxy)
+- [box4magisk](https://github.com/CHIZI-0618/box4magisk?tab=readme-ov-file)
 - [box_for_magisk](https://github.com/taamarin/box_for_magisk)
