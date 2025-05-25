@@ -23,12 +23,15 @@
 
 ## 教程
 
-- 用法教程及常见问题解答请前往 [docs](/docs/index.md) 查看
+1. 前往 [Release](https://github.com/twoone-3/AdGuardHomeForRoot/releases/latest) 页面下载模块
+2. 检查 Android 设置 -> 网络和互联网 -> 高级 -> 私人 DNS，确保 `私人 DNS` 关闭
+3. 在 root 管理器中安装模块，重启设备
+4. 若看到模块运行成功的提示，则可以访问 <http://127.0.0.1:3000> 进入 AdGuardHome 后台
+5. 若需要用法教程及常见问题解答请前往 [docs](/docs/index.md) 查看
 
 ## 鸣谢
 
 - [AWAwenue Ads Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)
 - [AdguardHome_magisk](https://github.com/410154425/AdGuardHome_magisk)
 - [akashaProxy](https://github.com/ModuleList/akashaProxy)
-- [box4magisk](https://github.com/CHIZI-0618/box4magisk?tab=readme-ov-file)
 - [box_for_magisk](https://github.com/taamarin/box_for_magisk)
