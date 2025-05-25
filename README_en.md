@@ -2,8 +2,6 @@
 
 English | [简体中文](README.md)
 
-A Magisk/KernelSU/APatch module to block ads by redirecting and filtering DNS requests. It can be used as a local ad-blocking module or transformed into a tool that runs AdGuardHome alone by adjusting the configuration file.
-
 ![arm-64 support](https://img.shields.io/badge/arm--64-support-ef476f?logo=linux&logoColor=white&color=ef476f)
 ![arm-v7 support](https://img.shields.io/badge/arm--v7-support-ffa500?logo=linux&logoColor=white&color=ffa500)
 ![GitHub downloads](https://img.shields.io/github/downloads/twoone-3/AdGuardHomeForRoot/total?logo=github&logoColor=white&color=ffd166)
@@ -12,6 +10,14 @@ A Magisk/KernelSU/APatch module to block ads by redirecting and filtering DNS re
 [![Join Telegram Group](https://img.shields.io/badge/Telegram-Join%20Group-118ab2?logo=telegram&logoColor=white)](https://t.me/twoone3_tech_tips_group)
 
 Follow our channel for the latest news, or join our group for discussion!
+
+## Introduction
+
+- This module is an AdGuardHome module running on Android devices, providing a local DNS server that blocks ads, malware, and trackers.
+- It can be used as a local ad-blocking module or transformed into a standalone AdGuardHome tool by adjusting the configuration file.
+- The module supports multiple installation methods, including Magisk, KernelSU, and APatch, making it compatible with most Android devices.
+- The design of this module aims to provide a lightweight ad-blocking solution, avoiding the complexity and performance loss associated with using VPNs.
+- It can coexist with other proxy software (such as [NekoBox](https://github.com/MatsuriDayo/NekoBoxForAndroid), [FlClash](https://github.com/chen08209/FlClash), [box for magisk](https://github.com/taamarin/box_for_magisk), [akashaProxy](https://github.com/akashaProxy/akashaProxy)), providing better privacy protection and network security.
 
 ## Features
 

@@ -1,22 +1,6 @@
 # Tutorials
 
-## 介绍
-
-本模块是一个在安卓设备上运行的 AdGuardHome 模块，提供了一个本地 DNS 服务器，能够屏蔽广告、恶意软件和跟踪器。
-
-它可以与其他代理软件（如 NekoBox、FlClash、box for magisk 等）共存，提供更好的隐私保护和网络安全。
-
-## 简易教程
-
-前往 [Release](https://github.com/twoone-3/AdGuardHomeForRoot/releases/latest) 页面下载模块
-
-检查 Android 设置 -> 网络和互联网 -> 高级 -> 私人 DNS，确保 `私人 DNS` 关闭
-
-在 root 管理器中安装模块，重启设备
-
-## 高级教程
-
-### 安装
+## 安装
 
 本模块仅适用于已经 root 的安卓设备，支持 [Magisk](https://github.com/topjohnwu/Magisk) / [KernelSU](https://github.com/tiann/KernelSU) / [APatch](https://github.com/bmax121/APatch) 等 root 工具
 
@@ -26,7 +10,7 @@
 
 ---
 
-### 配置
+## 配置
 
 模块默认的 AdGuardHome 后台地址为 `http://127.0.0.1:3000`，可以通过浏览器直接访问，默认账号和密码均为 `root`。
 
@@ -41,7 +25,7 @@
 
 ---
 
-### 模块控制
+## 模块控制
 
 模块的状态会实时显示在`module.prop`文件中，在root管理器中可以看到模块的状态信息（如果没刷新请手动刷新）
 
@@ -61,13 +45,13 @@ rm /data/adb/modules/AdGuardHome/disable
 
 ---
 
-### 与代理软件共存
+## 与代理软件共存
 
 代理软件主要分为两类：
 
 1. **代理应用**：如 [NekoBox](https://github.com/MatsuriDayo/NekoBoxForAndroid)、[FlClash](https://github.com/chen08209/FlClash) 等。这些应用通常具有图形化界面，便于用户配置和管理代理规则。
 
-2. **代理模块**：如 [box for magisk](https://github.com/taamarin/box_for_magisk)。这些模块通常运行在系统层级，适合需要更高权限或更深度集成的场景。
+2. **代理模块**：如 [box_for_magisk](https://github.com/taamarin/box_for_magisk)、[akashaProxy](https://github.com/akashaProxy/akashaProxy) 等。这些模块通常运行在系统层级，适合需要更高权限或更深度集成的场景。
 
 代理应用的 `分应用代理/访问控制` 功能非常实用。通过将国内应用设置为绕过模式，可以减少不必要的流量经过代理，同时这些绕过的应用仍然能够正常屏蔽广告。
 
@@ -75,7 +59,7 @@ rm /data/adb/modules/AdGuardHome/disable
 
 ---
 
-### 模块目录与配置文件
+## 模块目录与配置文件
 
 模块的文件结构主要分为以下两个目录：
 
@@ -91,7 +75,7 @@ rm /data/adb/modules/AdGuardHome/disable
 
 ---
 
-### 模块打包
+## 模块打包
 
 模块根目录下提供了一个名为 `pack.ps1` 的打包脚本，用户可以通过它快速生成模块的安装包。
 
@@ -109,9 +93,9 @@ rm /data/adb/modules/AdGuardHome/disable
 
 该脚本的设计确保了高效性：如果 `cache` 目录中已存在 AdGuardHome 的缓存版本，则无需重复下载，从而节省时间和带宽。
 
-### 常见问题
+## 常见问题
 
-#### **Q: 模块安装后无法正常运行怎么办？**  
+### **Q: 模块安装后无法正常运行怎么办？**  
 
 **A:**  
 
@@ -125,7 +109,7 @@ rm /data/adb/modules/AdGuardHome/disable
 - 确保设备的 **私人 DNS** 功能已关闭：  
   前往 **设置 -> 网络和互联网 -> 高级 -> 私人 DNS**，并将其设置为关闭。
 
-#### **Q: 如何更改 AdGuardHome 的默认端口？**  
+### **Q: 如何更改 AdGuardHome 的默认端口？**  
 
 **A:**  
 
@@ -133,7 +117,7 @@ rm /data/adb/modules/AdGuardHome/disable
 - 修改 `bind_host` 的端口号为所需值。  
 - 保存文件后，重启模块以应用更改。
 
-#### **Q: 如何禁用模块的 iptables 转发规则？**  
+### **Q: 如何禁用模块的 iptables 转发规则？**  
 
 **A:**  
 
@@ -141,14 +125,14 @@ rm /data/adb/modules/AdGuardHome/disable
 - 将 `ENABLE_IPTABLES` 参数设置为 `false`。  
 - 保存文件后，重启模块。
 
-#### **Q: 使用代理模块时，广告屏蔽无效怎么办？**  
+### **Q: 使用代理模块时，广告屏蔽无效怎么办？**  
 
 **A:**  
 
 - 确保代理模块的上游 DNS 服务器配置为 **`127.0.0.1:5591`**。  
 - 检查代理模块的配置文件，确保所有 DNS 查询通过 AdGuardHome。
 
-#### **Q: 模块是否会影响设备性能？**  
+### **Q: 模块是否会影响设备性能？**  
 
 **A:**  
 

@@ -2,10 +2,6 @@
 
 [English](README_en.md) | 简体中文
 
-## 简介
-
-> 一个通过重定向并过滤 DNS 请求来屏蔽广告的 Magisk / KernelSU / APatch 模块，既可以作为本机使用的屏蔽广告模块，又可以通过调整配置文件来改造成单纯运行 AdGuardHome 的工具
-
 ![arm-64 support](https://img.shields.io/badge/arm--64-support-ef476f?logo=linux&logoColor=white&color=ef476f)
 ![arm-v7 support](https://img.shields.io/badge/arm--v7-support-ffa500?logo=linux&logoColor=white&color=ffa500)
 ![GitHub downloads](https://img.shields.io/github/downloads/twoone-3/AdGuardHomeForRoot/total?logo=github&logoColor=white&color=ffd166)
@@ -13,7 +9,15 @@
 [![Join Telegram Channel](https://img.shields.io/badge/Telegram-Join%20Channel-06d6a0?logo=telegram&logoColor=white)](https://t.me/+Q3Ur_HCYdM0xM2I1)
 [![Join Telegram Group](https://img.shields.io/badge/Telegram-Join%20Group-118ab2?logo=telegram&logoColor=white)](https://t.me/twoone3_tech_tips_group)
 
-关注我们的频道以获取最新消息，或者加入我们的群组进行讨论！
+关注我们的频道获取最新消息，或加入我们的群组进行讨论！  
+
+## 简介
+
+- 本模块是一个在安卓设备上运行的 AdGuardHome 模块，提供了一个本地 DNS 服务器，能够屏蔽广告、恶意软件和跟踪器。
+- 它可以作为一个本地广告拦截模块使用，也可以通过调整配置文件，转变为一个独立运行的 AdGuardHome 工具。
+- 该模块支持 Magisk、KernelSU 和 APatch 等多种安装方式，适用于大多数 Android 设备。
+- 该模块的设计初衷是为了提供一个轻量级的广告拦截解决方案，避免了使用 VPN 的复杂性和性能损失。
+- 它可以与其他代理软件（如 [NekoBox](https://github.com/MatsuriDayo/NekoBoxForAndroid)、[FlClash](https://github.com/chen08209/FlClash)、[box for magisk](https://github.com/taamarin/box_for_magisk)、[akashaProxy](https://github.com/akashaProxy/akashaProxy) 等）共存，提供更好的隐私保护和网络安全。
 
 ## 特性
 
