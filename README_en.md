@@ -31,7 +31,7 @@ Follow our channel for the latest news, or join our group for discussion!
 2. Check Android Settings -> Network & Internet -> Advanced -> Private DNS, ensure `Private DNS` is turned off
 3. Install the module in the root manager and reboot the device
 4. If you see a successful module running prompt, you can access <http://127.0.0.1:3000> to enter the AdGuardHome backend
-5. For usage tutorials and FAQs, please visit [docs](/docs/index.md).
+5. For advanced usage tutorials and FAQs, please visit [docs](/docs/index.md).
 
 ## Acknowledgments
 
