@@ -13,7 +13,7 @@ start_adguardhome() {
   # set timezone to Shanghai
   export TZ="Asia/Shanghai"
   # run binary
-  busybox setuidgid "$adg_user:$adg_group" "$BIN_DIR/AdGuardHome" >>"$AGH_DIR/bin.log" 2>&1 &
+  busybox setuidgid "$adg_user:$adg_group" "$BIN_DIR/AdGuardHome" --no-check-update >>"$AGH_DIR/bin.log" 2>&1 &
   adg_pid=$!
 
   # check if AdGuardHome started successfully
@@ -22,11 +22,10 @@ start_adguardhome() {
     update_description "🥰 Started" "🥰 启动成功"
     echo "$adg_pid" >"$PID_FILE"
     log "AdGuardHome PID: $adg_pid" "AdGuardHome PID: $adg_pid"
-    append_description " PID: $adg_pid" " PID: $adg_pid"
     # check if iptables is enabled
     if [ "$enable_iptables" = true ]; then
       $SCRIPT_DIR/iptables.sh enable
-      append_description " enable_iptables: $enable_iptables" " enable_iptables: $enable_iptables"
+      log " enable_iptables: $enable_iptables" " enable_iptables: $enable_iptables"
     fi
   else
     log "😭 Error occurred, check logs for details" "😭 出现错误，请检查日志以获取详细信息"
@@ -48,7 +47,7 @@ stop_adguardhome() {
   update_description "❌ Stopped" "❌ 已停止"
   log "AdGuardHome stopped" "AdGuardHome 已停止"
   $SCRIPT_DIR/iptables.sh disable
-  append_description " enable_iptables: $enable_iptables" " enable_iptables: $enable_iptables"
+  log "Iptables disabled" "Iptables 已禁用"
 }
 
 toggle_adguardhome() {

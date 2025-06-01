@@ -52,7 +52,7 @@ dns:
   enable_dnssec: false
   edns_client_subnet:
     custom_ip: ""
-    enabled: false
+    enabled: true
     use_custom: false
   max_goroutines: 300
   handle_ddr: true
@@ -61,7 +61,7 @@ dns:
   bootstrap_prefer_ipv6: false
   upstream_timeout: 10s
   private_networks: []
-  use_private_ptr_resolvers: false
+  use_private_ptr_resolvers: true
   local_ptr_upstreams: []
   use_dns64: false
   dns64_prefixes: []
@@ -104,7 +104,9 @@ filters:
     name: AWAvenue
     id: 1732747955
 whitelist_filters: []
-user_rules: []
+user_rules:
+  - '@@||sdk-api.beizi.biz^$important'
+  - ""
 dhcp:
   enabled: false
   interface_name: ""
@@ -148,7 +150,7 @@ filtering:
   safesearch_cache_size: 1048576
   parental_cache_size: 1048576
   cache_time: 30
-  filters_update_interval: 24
+  filters_update_interval: 72
   blocked_response_ttl: 10
   filtering_enabled: true
   parental_enabled: false

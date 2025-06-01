@@ -57,7 +57,6 @@ foreach ($url in $UrlWitchCachePath.Keys) {
 
 # 给项目打包，使用 7-Zip 压缩 zip
 Write-Host "Packing AdGuardHome..."
-$7z = "C:\Program Files\7-Zip\7z.exe"
 $OutputPathArm64 = "$CacheDir\AdGuardHomeForRoot_arm64.zip"
 $OutputPathArmv7 = "$CacheDir\AdGuardHomeForRoot_armv7.zip"
 if (Test-Path -Path $OutputPathArm64) {
@@ -71,25 +70,25 @@ if (Test-Path -Path $OutputPathArmv7) {
 $ProjectRoot = "$PSScriptRoot\src"
 
 # pack arm64
-& $7z a -tzip $OutputPathArm64 "$ProjectRoot\*.sh"
-& $7z a -tzip $OutputPathArm64 "$ProjectRoot\settings.conf"
-& $7z a -tzip $OutputPathArm64 "$ProjectRoot\module.prop"
-& $7z a -tzip $OutputPathArm64 "$ProjectRoot\META-INF"
-& $7z a -tzip $OutputPathArm64 "$ProjectRoot\scripts"
-& $7z a -tzip $OutputPathArm64 "$ProjectRoot\webroot"
-& $7z a -tzip $OutputPathArm64 "$ProjectRoot\bin\"
-& $7z a -tzip $OutputPathArm64 "$CacheDir\arm64\AdGuardHome\AdGuardHome"
-& $7z rn $OutputPathArm64 "AdGuardHome" "bin/AdGuardHome"
+7z a -tzip $OutputPathArm64 "$ProjectRoot\*.sh"
+7z a -tzip $OutputPathArm64 "$ProjectRoot\settings.conf"
+7z a -tzip $OutputPathArm64 "$ProjectRoot\module.prop"
+7z a -tzip $OutputPathArm64 "$ProjectRoot\META-INF"
+7z a -tzip $OutputPathArm64 "$ProjectRoot\scripts"
+7z a -tzip $OutputPathArm64 "$ProjectRoot\webroot"
+7z a -tzip $OutputPathArm64 "$ProjectRoot\bin\"
+7z a -tzip $OutputPathArm64 "$CacheDir\arm64\AdGuardHome\AdGuardHome"
+7z rn $OutputPathArm64 "AdGuardHome" "bin/AdGuardHome"
 
 # pack armv7
-& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\*.sh"
-& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\settings.conf"
-& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\module.prop"
-& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\META-INF"
-& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\scripts"
-& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\webroot"
-& $7z a -tzip $OutputPathArmv7 "$ProjectRoot\bin\"
-& $7z a -tzip $OutputPathArmv7 "$CacheDir\armv7\AdGuardHome\AdGuardHome"
-& $7z rn $OutputPathArmv7 "AdGuardHome" "bin/AdGuardHome"
+7z a -tzip $OutputPathArmv7 "$ProjectRoot\*.sh"
+7z a -tzip $OutputPathArmv7 "$ProjectRoot\settings.conf"
+7z a -tzip $OutputPathArmv7 "$ProjectRoot\module.prop"
+7z a -tzip $OutputPathArmv7 "$ProjectRoot\META-INF"
+7z a -tzip $OutputPathArmv7 "$ProjectRoot\scripts"
+7z a -tzip $OutputPathArmv7 "$ProjectRoot\webroot"
+7z a -tzip $OutputPathArmv7 "$ProjectRoot\bin\"
+7z a -tzip $OutputPathArmv7 "$CacheDir\armv7\AdGuardHome\AdGuardHome"
+7z rn $OutputPathArmv7 "AdGuardHome" "bin/AdGuardHome"
 
 Write-Host "Packing completed successfully."

@@ -26,9 +26,3 @@ function update_description() {
   [ "$language" = "en" ] && description="$1" || description="$2"
   sed -i "/^description=/c\description=$description" "$MOD_PATH/module.prop"
 }
-
-function append_description() {
-  local description
-  [ "$language" = "en" ] && description="$1" || description="$2"
-  sed -i "/^description=/ s|\$|$description|" "$MOD_PATH/module.prop"
-}

@@ -27,10 +27,11 @@ SCRIPT_DIR="$AGH_DIR/scripts"
 PID_FILE="$AGH_DIR/bin/agh.pid"
 
 info "- 📦 Extracting module basic files..." "- 📦 解压模块基本文件..."
-unzip -o "$ZIPFILE" "action.sh" -d "$MODPATH" >/dev/null 2>&1
+unzip -o "$ZIPFILE" "action.sh" -d "$MODPATH" >/dev/null 2>&1 
 unzip -o "$ZIPFILE" "module.prop" -d "$MODPATH" >/dev/null 2>&1
 unzip -o "$ZIPFILE" "service.sh" -d "$MODPATH" >/dev/null 2>&1
 unzip -o "$ZIPFILE" "uninstall.sh" -d "$MODPATH" >/dev/null 2>&1
+unzip -o "$ZIPFILE" "webroot/*" -d "$MODPATH" >/dev/null 2>&1
 
 extract_keep_config() {
   info "- 🌈 Keeping old configuration files..." "- 🌈 保留原来的配置文件..."
