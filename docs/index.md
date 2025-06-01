@@ -59,7 +59,7 @@ dns:
   listen: :1053
   ipv6: true
   enhanced-mode: fake-ip
-  fake-ip-range: 28.0.0.1/8
+  fake-ip-range: 198.18.0.1/16
   fake-ip-filter:
     - '*'
     - '+.lan'
@@ -67,23 +67,16 @@ dns:
   default-nameserver:
     - 223.5.5.5
     - 119.29.29.29
-    - 114.114.114.114
-    - '[2402:4e00::]'
-    - '[2400:3200::1]'
   nameserver:
-    - 'tls://8.8.4.4#dns'
-    - 'tls://1.0.0.1#dns'
-    - 'tls://[2001:4860:4860::8844]#dns'
-    - 'tls://[2606:4700:4700::1001]#dns'
+    - 'https://1.1.1.1/dns-query'
+    - 'https://8.8.8.8/dns-query'
   proxy-server-nameserver:
-    - https://doh.pub/dns-query
+    - "https://223.5.5.5/dns-query"
+    - "https://1.12.12.12/dns-query"
   nameserver-policy:
     "geosite:cn,private":
-      - https://doh.pub/dns-query
-      - https://dns.alidns.com/dns-query
-    "geosite:!cn,!private": 
-      - "tls://dns.google"
-      - "tls://cloudflare-dns.com"
+      - "https://223.5.5.5/dns-query"
+      - "https://1.12.12.12/dns-query"
 
 proxy-providers:
   provider1:
