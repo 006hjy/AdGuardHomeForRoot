@@ -39,3 +39,8 @@ Follow our channel for the latest news, or join our group for discussion!
 - [AdguardHome_magisk](https://github.com/410154425/AdGuardHome_magisk)
 - [akashaProxy](https://github.com/ModuleList/akashaProxy)
 - [box_for_magisk](https://github.com/taamarin/box_for_magisk)
+
+> Special thanks to sponsors:
+>
+> - y******a - 200
+> - 偶****** - 10

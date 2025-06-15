@@ -39,3 +39,8 @@
 - [AdguardHome_magisk](https://github.com/410154425/AdGuardHome_magisk)
 - [akashaProxy](https://github.com/ModuleList/akashaProxy)
 - [box_for_magisk](https://github.com/taamarin/box_for_magisk)
+
+> 特别感谢赞助：
+>
+> - y******a - 200
+> - 偶****** - 10
