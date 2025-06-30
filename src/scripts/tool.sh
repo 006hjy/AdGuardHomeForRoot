@@ -18,14 +18,15 @@ start_adguardhome() {
 
   # check if AdGuardHome started successfully
   if ps | grep -w "$adg_pid" | grep -q "AdGuardHome"; then
-    log "🥰 started" "🥰 启动成功"
-    update_description "🥰 Started" "🥰 启动成功"
     echo "$adg_pid" >"$PID_FILE"
-    log "AdGuardHome PID: $adg_pid" "AdGuardHome PID: $adg_pid"
     # check if iptables is enabled
     if [ "$enable_iptables" = true ]; then
       $SCRIPT_DIR/iptables.sh enable
-      log " enable_iptables: $enable_iptables" " enable_iptables: $enable_iptables"
+      log "🥰 started PID: $adg_pid iptables: enabled" "🥰 启动成功 PID: $adg_pid iptables 已启用"
+      update_description "🥰 Started PID: $adg_pid iptables: enabled" "🥰 启动成功 PID: $adg_pid iptables 已启用"
+    else
+      log "🥰 started PID: $adg_pid iptables: disabled" "🥰 启动成功 PID: $adg_pid iptables 已禁用"
+      update_description "🥰 Started PID: $adg_pid iptables: disabled" "🥰 启动成功 PID: $adg_pid iptables 已禁用"
     fi
   else
     log "😭 Error occurred, check logs for details" "😭 出现错误，请检查日志以获取详细信息"
