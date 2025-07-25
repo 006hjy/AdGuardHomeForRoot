@@ -12,8 +12,14 @@ start_adguardhome() {
   export SSL_CERT_DIR="/system/etc/security/cacerts/"
   # set timezone to Shanghai
   export TZ="Asia/Shanghai"
+
+  # backup old log and overwrite new log
+  if [ -f "$AGH_DIR/bin.log" ]; then
+    mv "$AGH_DIR/bin.log" "$AGH_DIR/bin.log.bak"
+  fi
+
   # run binary
-  busybox setuidgid "$adg_user:$adg_group" "$BIN_DIR/AdGuardHome" --no-check-update >>"$AGH_DIR/bin.log" 2>&1 &
+  busybox setuidgid "$adg_user:$adg_group" "$BIN_DIR/AdGuardHome" --no-check-update >"$AGH_DIR/bin.log" 2>&1 &
   adg_pid=$!
 
   # check if AdGuardHome started successfully
@@ -38,17 +44,16 @@ start_adguardhome() {
 
 stop_adguardhome() {
   if [ -f "$PID_FILE" ]; then
-    log "Killing AdGuardHome using PID: $(cat $PID_FILE)" "使用 PID 杀死 AdGuardHome: $(cat $PID_FILE)"
-    kill $(cat "$PID_FILE") || kill -9 $(cat "$PID_FILE")
+    pid=$(cat "$PID_FILE")
+    kill $pid || kill -9 $pid
     rm "$PID_FILE"
+    log "AdGuardHome stopped (PID: $pid)" "AdGuardHome 已停止 (PID: $pid)"
   else
-    log "Force killing AdGuardHome" "强制杀死 AdGuardHome"
     pkill -f "AdGuardHome" || pkill -9 -f "AdGuardHome"
+    log "AdGuardHome force stopped" "AdGuardHome 强制停止"
   fi
   update_description "❌ Stopped" "❌ 已停止"
-  log "AdGuardHome stopped" "AdGuardHome 已停止"
   $SCRIPT_DIR/iptables.sh disable
-  log "Iptables disabled" "Iptables 已禁用"
 }
 
 toggle_adguardhome() {
