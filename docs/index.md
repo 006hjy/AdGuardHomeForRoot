@@ -1,6 +1,8 @@
-# Tutorials
+# 教程 (Tutorials)
 
-## 安装
+> **For English Users:** This module is primarily designed for Chinese users. If you require the documentation in English, we kindly recommend using a reliable translation tool.
+
+## 安装 (Installation)
 
 本模块仅适用于已经 root 的安卓设备，支持 [Magisk](https://github.com/topjohnwu/Magisk) / [KernelSU](https://github.com/tiann/KernelSU) / [APatch](https://github.com/bmax121/APatch) 等 root 工具
 
@@ -10,7 +12,7 @@
 
 ---
 
-## 配置
+## 配置 (Configuration)
 
 模块默认的 AdGuardHome 后台地址为 `http://127.0.0.1:3000`，可以通过浏览器直接访问，默认账号和密码均为 `root`。
 
@@ -25,7 +27,7 @@
 
 ---
 
-## 模块控制
+## 模块控制 (Module Control)
 
 模块的状态会实时显示在`module.prop`文件中，在root管理器中可以看到模块的状态信息（如果没刷新请手动刷新）
 
@@ -45,7 +47,7 @@ rm /data/adb/modules/AdGuardHome/disable
 
 ---
 
-## 与代理软件共存
+## 与代理软件共存 (Coexistence with Proxy Software)
 
 代理软件主要分为两类：
 
@@ -145,7 +147,7 @@ dns:
 
 ---
 
-## 模块目录与配置文件
+## 模块目录与配置文件 (Module Directory and Configuration Files)
 
 模块的文件结构主要分为以下两个目录：
 
@@ -161,7 +163,7 @@ dns:
 
 ---
 
-## 模块打包
+## 模块打包 (Module Packaging)
 
 模块根目录下提供了一个名为 `pack.ps1` 的打包脚本，用户可以通过它快速生成模块的安装包。
 
@@ -179,7 +181,7 @@ dns:
 
 该脚本的设计确保了高效性：如果 `cache` 目录中已存在 AdGuardHome 的缓存版本，则无需重复下载，从而节省时间和带宽。
 
-## 常见问题
+## 常见问题 (Frequently Asked Questions)
 
 ### **Q: 模块安装后无法正常运行怎么办？**  
 
