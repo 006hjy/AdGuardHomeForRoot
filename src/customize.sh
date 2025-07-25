@@ -102,4 +102,4 @@ chown root:net_raw "$BIN_DIR/AdGuardHome"
 
 chmod +x "$SCRIPT_DIR"/*.sh "$MODPATH"/*.sh
 
-info "- ✅ Installation completed, please reboot." "- ✅ 安装完成，请重启设备。"
+info "- 🎉 Installation completed, please reboot." "- 🎉 安装完成，请重启设备。"
