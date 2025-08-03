@@ -56,30 +56,6 @@ rm /data/adb/modules/AdGuardHome/disable
 以下是我自用的 FlClash 配置文件示例：
 
 ```yaml
-dns:
-  enable: true
-  listen: :1053
-  ipv6: true
-  enhanced-mode: fake-ip
-  fake-ip-range: 198.18.0.1/16
-  fake-ip-filter:
-    - '*'
-    - '+.lan'
-    - '+.local'
-  default-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
-  nameserver:
-    - 'https://1.1.1.1/dns-query'
-    - 'https://8.8.8.8/dns-query'
-  proxy-server-nameserver:
-    - "https://223.5.5.5/dns-query"
-    - "https://1.12.12.12/dns-query"
-  nameserver-policy:
-    "geosite:cn,private":
-      - "https://223.5.5.5/dns-query"
-      - "https://1.12.12.12/dns-query"
-
 proxy-providers:
   provider1:
     type: http
@@ -99,22 +75,23 @@ proxy-groups:
     include-all: true
 
 rules:
-  # direct FCM
-  - AND,((NETWORK,TCP),(DST-PORT,5228-5230),(OR,((DOMAIN-KEYWORD,google)))),DIRECT
+proxy-groups:
+  - name: PROXY
+    type: select
+    include-all: true
 
-  # direct ntp
-  - AND,((NETWORK,UDP),(DST-PORT,123)),DIRECT
-
-  # geosite rules
+rules:
+  # rules geosite
   - GEOSITE,private,DIRECT
   - GEOSITE,telegram,PROXY
-  - GEOSITE,youtube,PROXY
   - GEOSITE,google,PROXY
+  - GEOSITE,googlefcm,DIRECT
+  - GEOSITE,bilibili,DIRECT
+  - GEOSITE,youtube,PROXY
   - GEOSITE,twitter,PROXY
   - GEOSITE,pixiv,PROXY
   - GEOSITE,category-scholar-!cn,PROXY
-  - GEOSITE,bilibili,DIRECT
-  - GEOSITE,onedrive,DIRECT
+  - GEOSITE,onedrive,PROXY
   - GEOSITE,microsoft@cn,DIRECT
   - GEOSITE,apple-cn,DIRECT
   - GEOSITE,steam@cn,DIRECT
@@ -122,11 +99,11 @@ rules:
   - GEOSITE,geolocation-!cn,PROXY
   - GEOSITE,cn,DIRECT
 
-  # geoip rules
+  # rules geoip
   - GEOIP,private,DIRECT,no-resolve
-  - GEOIP,telegram,PROXY
-  - GEOIP,CN,DIRECT
+  - GEOIP,cn,DIRECT
   - MATCH,PROXY
+
 ```
 
 **代理模块**：如 [box_for_magisk](https://github.com/taamarin/box_for_magisk)、[akashaProxy](https://github.com/akashaProxy/akashaProxy) 等。这些模块通常运行在系统层级，适合需要更高权限或更深度集成的场景。
