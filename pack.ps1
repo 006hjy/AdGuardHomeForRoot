@@ -68,6 +68,7 @@ if (Test-Path -Path $OutputPathArmv7) {
 
 # 设置项目根目录
 $ProjectRoot = "$PSScriptRoot\src"
+$env:PATH += ";C:\Program Files\7-Zip"
 
 # pack arm64
 7z a -tzip $OutputPathArm64 "$ProjectRoot\*.sh"
