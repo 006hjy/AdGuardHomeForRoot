@@ -1,0 +1,157 @@
+name: Build AdGuardHome Package
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Get latest AdGuardHome release version
+      id: get_version
+      run: |
+        # Get the latest release tag from AdGuardHome repository
+        # Try multiple methods to get the latest version
+        LATEST_VERSION=""
+        
+        # Method 1: Using GitHub API
+        if [ -z "$LATEST_VERSION" ]; then
+          LATEST_VERSION=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest | jq -r '.tag_name' 2>/dev/null)
+          if [ "$LATEST_VERSION" = "null" ] || [ -z "$LATEST_VERSION" ]; then
+            LATEST_VERSION=""
+          fi
+        fi
+        
+        # Method 2: Using redirects from latest download URL
+        if [ -z "$LATEST_VERSION" ]; then
+          LATEST_VERSION=$(curl -s -I https://github.com/AdguardTeam/AdGuardHome/releases/latest/download/AdGuardHome_linux_arm64.tar.gz | grep -i location | sed 's/.*\/releases\/download\/\([^\/]*\)\/.*/\1/' | tr -d '\r')
+        fi
+        
+        # Method 3: Scraping the tags page (fallback)
+        if [ -z "$LATEST_VERSION" ]; then
+          LATEST_VERSION=$(curl -s https://github.com/AdguardTeam/AdGuardHome/tags | grep -o 'href="/AdguardTeam/AdGuardHome/releases/tag/[^"]*"' | head -1 | sed 's/.*tag\/\([^"]*\)".*/\1/')
+        fi
+        
+        # If still empty, use a known stable version
+        if [ -z "$LATEST_VERSION" ]; then
+          LATEST_VERSION="v0.107.52"
+          echo "Warning: Could not determine latest version, using fallback: $LATEST_VERSION"
+        fi
+        
+        echo "Latest AdGuardHome version: $LATEST_VERSION"
+        echo "version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+        echo "version_clean=${LATEST_VERSION#v}" >> $GITHUB_OUTPUT
+
+    - name: Download AdGuardHome
+      run: |
+        # Download the latest AdGuardHome_linux_arm64.tar.gz
+        VERSION="${{ steps.get_version.outputs.version }}"
+        DOWNLOAD_URL="https://github.com/AdguardTeam/AdGuardHome/releases/download/${VERSION}/AdGuardHome_linux_arm64.tar.gz"
+        echo "Downloading from: $DOWNLOAD_URL"
+        
+        # Create temp directory
+        mkdir -p temp
+        
+        # Download the tar.gz file
+        if curl -L -o temp/AdGuardHome_linux_arm64.tar.gz "$DOWNLOAD_URL"; then
+          echo "Download successful"
+        else
+          echo "Download failed"
+          exit 1
+        fi
+        
+        # Verify download
+        if [ -f "temp/AdGuardHome_linux_arm64.tar.gz" ] && [ -s "temp/AdGuardHome_linux_arm64.tar.gz" ]; then
+          echo "Downloaded file verified"
+          ls -la temp/
+        else
+          echo "Downloaded file is missing or empty"
+          exit 1
+        fi
+
+    - name: Extract AdGuardHome binary
+      run: |
+        # Extract the tar.gz file
+        cd temp
+        if tar -xzf AdGuardHome_linux_arm64.tar.gz; then
+          echo "Extraction successful"
+        else
+          echo "Extraction failed"
+          exit 1
+        fi
+        
+        # Verify extraction
+        ls -la
+        ls -la AdGuardHome/
+        
+        # Check if AdGuardHome binary exists and is executable
+        if [ -f "AdGuardHome/AdGuardHome" ]; then
+          echo "AdGuardHome binary found successfully"
+          file AdGuardHome/AdGuardHome
+          echo "Binary size: $(du -h AdGuardHome/AdGuardHome | cut -f1)"
+        else
+          echo "Error: AdGuardHome binary not found"
+          exit 1
+        fi
+
+    - name: Create package
+      run: |
+        VERSION_CLEAN="${{ steps.get_version.outputs.version_clean }}"
+        PACKAGE_NAME="AdGuardHomeForRoot_${VERSION_CLEAN}_arm64.zip"
+        echo "Creating package: $PACKAGE_NAME"
+        
+        # Create a staging directory for the package
+        mkdir -p package_staging
+        
+        # Copy all files from src directory to staging
+        cp -r src/* package_staging/
+        
+        # Create bin directory if it doesn't exist
+        mkdir -p package_staging/bin
+        
+        # Copy the AdGuardHome binary to bin directory
+        cp temp/AdGuardHome/AdGuardHome package_staging/bin/
+        
+        # Make the binary executable
+        chmod +x package_staging/bin/AdGuardHome
+        
+        # Verify the structure
+        echo "Package structure:"
+        find package_staging -type f -exec ls -la {} \;
+        
+        # Create the zip package
+        cd package_staging
+        zip -r "../$PACKAGE_NAME" .
+        cd ..
+        
+        # Verify the package was created
+        ls -la "$PACKAGE_NAME"
+        echo "Package created successfully: $PACKAGE_NAME"
+
+    - name: Upload package as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AdGuardHomeForRoot_${{ steps.get_version.outputs.version_clean }}_arm64
+        path: AdGuardHomeForRoot_${{ steps.get_version.outputs.version_clean }}_arm64.zip
+        retention-days: 30
+
+    - name: Display package info
+      run: |
+        VERSION_CLEAN="${{ steps.get_version.outputs.version_clean }}"
+        PACKAGE_NAME="AdGuardHomeForRoot_${VERSION_CLEAN}_arm64.zip"
+        
+        echo "=== Package Information ==="
+        echo "AdGuardHome Version: ${{ steps.get_version.outputs.version }}"
+        echo "Package Name: $PACKAGE_NAME"
+        echo "Package Size: $(du -h "$PACKAGE_NAME" | cut -f1)"
+        
+        echo "=== Package Contents ==="
+        unzip -l "$PACKAGE_NAME"
