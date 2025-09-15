@@ -1,0 +1,281 @@
+name: Build AdGuardHome for Root
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 2 AM UTC to check for new releases
+    - cron: '0 2 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [arm64, armv7]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Get latest AdGuardHome release
+      id: get_release
+      run: |
+        # Get the latest release (including pre-releases) from AdGuardHome repository
+        echo "Fetching latest AdGuardHome release information..."
+        
+        # Method 1: Try GitHub API
+        RELEASE_JSON=$(curl -s -f -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/AdguardTeam/AdGuardHome/releases" 2>/dev/null || echo "")
+        
+        if [ -n "$RELEASE_JSON" ] && [ "$RELEASE_JSON" != "Blocked by DNS monitoring proxy" ]; then
+          TAG_NAME=$(echo "$RELEASE_JSON" | jq -r '.[0].tag_name' 2>/dev/null)
+          if [ "$TAG_NAME" != "null" ] && [ -n "$TAG_NAME" ]; then
+            echo "Successfully fetched latest release from API: $TAG_NAME"
+          else
+            TAG_NAME=""
+          fi
+        else
+          TAG_NAME=""
+        fi
+        
+        # Method 2: Fallback to releases page scraping
+        if [ -z "$TAG_NAME" ] || [ "$TAG_NAME" = "null" ]; then
+          echo "API method failed, trying web scraping..."
+          TAG_NAME=$(curl -s "https://github.com/AdguardTeam/AdGuardHome/releases" | grep -oP 'href="/AdguardTeam/AdGuardHome/releases/tag/v[0-9]+\.[0-9]+\.[0-9]+[^"]*"' | head -1 | sed 's/.*tag\/\(v[^"]*\)".*/\1/' || echo "")
+        fi
+        
+        # Method 3: Final fallback to known working release
+        if [ -z "$TAG_NAME" ] || [ "$TAG_NAME" = "null" ]; then
+          echo "All methods failed, using fallback release"
+          TAG_NAME="v0.107.52"
+        fi
+        
+        # Set architecture specific download URL
+        if [ "${{ matrix.arch }}" = "armv7" ]; then
+          DOWNLOAD_URL="https://github.com/AdguardTeam/AdGuardHome/releases/download/${TAG_NAME}/AdGuardHome_linux_armv7.tar.gz"
+        else
+          DOWNLOAD_URL="https://github.com/AdguardTeam/AdGuardHome/releases/download/${TAG_NAME}/AdGuardHome_linux_arm64.tar.gz"
+        fi
+        
+        echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+        echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+        echo "Using AdGuardHome release: $TAG_NAME"
+        echo "Download URL: $DOWNLOAD_URL"
+        echo "Architecture: ${{ matrix.arch }}"
+    
+    - name: Download and extract AdGuardHome
+      run: |
+        # Create temporary directory
+        mkdir -p temp_extract
+        
+        # Set filename based on architecture
+        if [ "${{ matrix.arch }}" = "armv7" ]; then
+          FILENAME="AdGuardHome_linux_armv7.tar.gz"
+        else
+          FILENAME="AdGuardHome_linux_arm64.tar.gz"
+        fi
+        
+        # Download the latest AdGuardHome release with retries
+        echo "Downloading AdGuardHome from: ${{ steps.get_release.outputs.download_url }}"
+        
+        DOWNLOAD_SUCCESS=false
+        for i in {1..3}; do
+          echo "Download attempt $i..."
+          if curl -L -f -o "$FILENAME" "${{ steps.get_release.outputs.download_url }}"; then
+            if [ -s "$FILENAME" ]; then
+              echo "Download successful on attempt $i"
+              DOWNLOAD_SUCCESS=true
+              break
+            else
+              echo "Downloaded file is empty, retrying..."
+              rm -f "$FILENAME"
+            fi
+          else
+            echo "Download failed on attempt $i"
+          fi
+          sleep 5
+        done
+        
+        if [ "$DOWNLOAD_SUCCESS" != "true" ]; then
+          echo "Error: Failed to download AdGuardHome after 3 attempts"
+          exit 1
+        fi
+        
+        # Verify file size
+        FILESIZE=$(stat -c%s "$FILENAME")
+        echo "Downloaded file size: $FILESIZE bytes"
+        if [ "$FILESIZE" -lt 1000000 ]; then
+          echo "Warning: Downloaded file seems too small (less than 1MB)"
+        fi
+        
+        # Extract the tar.gz file
+        echo "Extracting $FILENAME..."
+        tar -xzf "$FILENAME" -C temp_extract
+        
+        # Check if extraction was successful
+        if [ -f "temp_extract/AdGuardHome/AdGuardHome" ]; then
+          echo "AdGuardHome binary extracted successfully"
+          ls -la temp_extract/AdGuardHome/
+          file temp_extract/AdGuardHome/AdGuardHome
+        else
+          echo "Error: AdGuardHome binary not found after extraction"
+          echo "Contents of temp_extract:"
+          find temp_extract -type f
+          exit 1
+        fi
+    
+    - name: Copy AdGuardHome binary to bin directory
+      run: |
+        # Ensure bin directory exists
+        mkdir -p src/bin
+        
+        # Copy the AdGuardHome binary to the bin directory
+        cp temp_extract/AdGuardHome/AdGuardHome src/bin/
+        
+        # Make it executable
+        chmod +x src/bin/AdGuardHome
+        
+        # Verify the binary was copied
+        echo "AdGuardHome binary copied to src/bin/"
+        ls -la src/bin/AdGuardHome
+        
+        # Show file size and type
+        file src/bin/AdGuardHome
+        du -h src/bin/AdGuardHome
+    
+    - name: Create release archive
+      run: |
+        # Create cache directory for output
+        mkdir -p cache
+        
+        # Create zip archive with all src files including the AdGuardHome binary
+        cd src
+        zip -r ../cache/AdGuardHomeForRoot_${{ matrix.arch }}.zip .
+        cd ..
+        
+        echo "Archive created successfully"
+        ls -la cache/
+        
+        # Show contents of the archive
+        echo "Contents of AdGuardHomeForRoot_${{ matrix.arch }}.zip:"
+        unzip -l cache/AdGuardHomeForRoot_${{ matrix.arch }}.zip
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: AdGuardHomeForRoot_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}
+        path: cache/AdGuardHomeForRoot_${{ matrix.arch }}.zip
+        retention-days: 30
+    
+    - name: Clean up
+      run: |
+        # Clean up temporary files
+        rm -rf temp_extract
+        rm -f AdGuardHome_linux_*.tar.gz
+        echo "Cleanup completed"
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Get latest AdGuardHome release tag
+      id: get_tag
+      run: |
+        # Get the latest release tag (same logic as build job)
+        RELEASE_JSON=$(curl -s -f -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/AdguardTeam/AdGuardHome/releases" 2>/dev/null || echo "")
+        
+        if [ -n "$RELEASE_JSON" ] && [ "$RELEASE_JSON" != "Blocked by DNS monitoring proxy" ]; then
+          TAG_NAME=$(echo "$RELEASE_JSON" | jq -r '.[0].tag_name' 2>/dev/null)
+          if [ "$TAG_NAME" != "null" ] && [ -n "$TAG_NAME" ]; then
+            echo "Successfully fetched latest release from API: $TAG_NAME"
+          else
+            TAG_NAME=""
+          fi
+        else
+          TAG_NAME=""
+        fi
+        
+        if [ -z "$TAG_NAME" ] || [ "$TAG_NAME" = "null" ]; then
+          echo "API method failed, trying web scraping..."
+          TAG_NAME=$(curl -s "https://github.com/AdguardTeam/AdGuardHome/releases" | grep -oP 'href="/AdguardTeam/AdGuardHome/releases/tag/v[0-9]+\.[0-9]+\.[0-9]+[^"]*"' | head -1 | sed 's/.*tag\/\(v[^"]*\)".*/\1/' || echo "")
+        fi
+        
+        if [ -z "$TAG_NAME" ] || [ "$TAG_NAME" = "null" ]; then
+          echo "All methods failed, using fallback release"
+          TAG_NAME="v0.107.52"
+        fi
+        
+        echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+        echo "Using AdGuardHome release: $TAG_NAME"
+    
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: AdGuardHomeForRoot_*_${{ steps.get_tag.outputs.tag_name }}
+        path: artifacts
+        merge-multiple: true
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: "adguard-${{ steps.get_tag.outputs.tag_name }}-${{ github.run_number }}"
+        release_name: "AdGuardHome for Root (${{ steps.get_tag.outputs.tag_name }})"
+        body: |
+          ## AdGuardHome for Root
+          
+          基于 AdGuardHome ${{ steps.get_tag.outputs.tag_name }} 构建
+          
+          ### 安装说明
+          1. 根据设备架构下载对应的 zip 文件
+             - ARM64 设备: AdGuardHomeForRoot_arm64.zip
+             - ARMv7 设备: AdGuardHomeForRoot_armv7.zip
+          2. 在 Magisk/KernelSU/APatch 中安装模块
+          3. 重启设备
+          4. 访问 http://127.0.0.1:3000 进入管理界面
+          
+          ### 默认账户
+          - 用户名: root
+          - 密码: root
+          
+          ### 特性
+          - 支持 ARM64 和 ARMv7 设备
+          - 集成秋风广告规则
+          - 自动转发本机 DNS 请求
+          - Web 管理界面
+          
+          ### 架构说明
+          - ARM64: 适用于大多数现代 Android 设备
+          - ARMv7: 适用于较老的 32 位 Android 设备
+        draft: false
+        prerelease: false
+    
+    - name: Upload ARM64 Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/AdGuardHomeForRoot_arm64.zip
+        asset_name: AdGuardHomeForRoot_arm64.zip
+        asset_content_type: application/zip
+    
+    - name: Upload ARMv7 Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/AdGuardHomeForRoot_armv7.zip
+        asset_name: AdGuardHomeForRoot_armv7.zip
+        asset_content_type: application/zip
