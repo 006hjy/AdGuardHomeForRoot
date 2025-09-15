@@ -68,12 +68,8 @@ jobs:
         # Create temporary directory
         mkdir -p temp_extract
         
-        # Set filename based on architecture
-        if [ "${{ matrix.arch }}" = "armv7" ]; then
-          FILENAME="AdGuardHome_linux_armv7.tar.gz"
-        else
-          FILENAME="AdGuardHome_linux_arm64.tar.gz"
-        fi
+        # Set filename for arm64 architecture only
+        FILENAME="AdGuardHome_linux_arm64.tar.gz"
         
         # Download the latest AdGuardHome release with retries
         echo "Downloading AdGuardHome from: ${{ steps.get_release.outputs.download_url }}"
@@ -234,9 +230,7 @@ jobs:
           基于 AdGuardHome ${{ steps.get_tag.outputs.tag_name }} 构建
           
           ### 安装说明
-          1. 根据设备架构下载对应的 zip 文件
-             - ARM64 设备: AdGuardHomeForRoot_arm64.zip
-             - ARMv7 设备: AdGuardHomeForRoot_armv7.zip
+          1. 下载 ARM64 设备适用的 zip 文件：AdGuardHomeForRoot_arm64.zip
           2. 在 Magisk/KernelSU/APatch 中安装模块
           3. 重启设备
           4. 访问 http://127.0.0.1:3000 进入管理界面
@@ -246,14 +240,13 @@ jobs:
           - 密码: root
           
           ### 特性
-          - 支持 ARM64 和 ARMv7 设备
+          - 支持 ARM64 设备
           - 集成秋风广告规则
           - 自动转发本机 DNS 请求
           - Web 管理界面
           
           ### 架构说明
           - ARM64: 适用于大多数现代 Android 设备
-          - ARMv7: 适用于较老的 32 位 Android 设备
         draft: false
         prerelease: false
     
@@ -265,14 +258,4 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: artifacts/AdGuardHomeForRoot_arm64.zip
         asset_name: AdGuardHomeForRoot_arm64.zip
-        asset_content_type: application/zip
-    
-    - name: Upload ARMv7 Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: artifacts/AdGuardHomeForRoot_armv7.zip
-        asset_name: AdGuardHomeForRoot_armv7.zip
         asset_content_type: application/zip
