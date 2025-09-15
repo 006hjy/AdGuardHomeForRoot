@@ -146,21 +146,21 @@ jobs:
         
         # Create zip archive with all src files including the AdGuardHome binary
         cd src
-        zip -r ../cache/AdGuardHomeForRoot_${{ matrix.arch }}.zip .
+        zip -r ../cache/AdGuardHomeForRoot_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}.zip .
         cd ..
         
         echo "Archive created successfully"
         ls -la cache/
         
         # Show contents of the archive
-        echo "Contents of AdGuardHomeForRoot_${{ matrix.arch }}.zip:"
-        unzip -l cache/AdGuardHomeForRoot_${{ matrix.arch }}.zip
+        echo "Contents of AdGuardHomeForRoot_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}.zip:"
+        unzip -l cache/AdGuardHomeForRoot_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}.zip
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: AdGuardHomeForRoot_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}
-        path: cache/AdGuardHomeForRoot_${{ matrix.arch }}.zip
+        path: cache/AdGuardHomeForRoot_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}.zip
         retention-days: 30
     
     - name: Clean up
@@ -230,7 +230,7 @@ jobs:
           基于 AdGuardHome ${{ steps.get_tag.outputs.tag_name }} 构建
           
           ### 安装说明
-          1. 下载 ARM64 设备适用的 zip 文件：AdGuardHomeForRoot_arm64.zip
+          1. 下载 ARM64 设备适用的 zip 文件：AdGuardHomeForRoot_arm64_${TAG}.zip（其中 ${TAG} 为 ${{ steps.get_tag.outputs.tag_name }}）
           2. 在 Magisk/KernelSU/APatch 中安装模块
           3. 重启设备
           4. 访问 http://127.0.0.1:3000 进入管理界面
@@ -256,6 +256,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: artifacts/AdGuardHomeForRoot_arm64.zip
-        asset_name: AdGuardHomeForRoot_arm64.zip
+        asset_path: artifacts/AdGuardHomeForRoot_arm64_${{ steps.get_tag.outputs.tag_name }}.zip
+        asset_name: AdGuardHomeForRoot_arm64_${{ steps.get_tag.outputs.tag_name }}.zip
         asset_content_type: application/zip
