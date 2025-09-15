@@ -208,7 +208,7 @@ dns:
 
 **A:**
 
-- 如果你用的是 FlClash，可以尝试以下配置：
+- 如果你用的是 FlClash，可尝试在`settings.conf`填入以下配置：
 
 ```ini
 ignore_src_list="172.19.0.1"
