@@ -155,3 +155,29 @@ jobs:
         
         echo "=== Package Contents ==="
         unzip -l "$PACKAGE_NAME"
+
+    - name: Create Release
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.get_version.outputs.version_clean }}
+        name: AdGuardHomeForRoot v${{ steps.get_version.outputs.version_clean }}
+        body: |
+          AdGuardHome For Root Package v${{ steps.get_version.outputs.version_clean }}
+          
+          Based on AdGuardHome ${{ steps.get_version.outputs.version }}
+          
+          ## Installation
+          1. Download the AdGuardHomeForRoot_${{ steps.get_version.outputs.version_clean }}_arm64.zip file
+          2. Install via your preferred method (Magisk, KernelSU, etc.)
+          
+          ## Changes
+          - Updated to AdGuardHome ${{ steps.get_version.outputs.version }}
+          
+          For more details, see the [changelog](https://raw.githubusercontent.com/006hjy/AdGuardHomeForRoot/main/changelog.md).
+        files: |
+          AdGuardHomeForRoot_${{ steps.get_version.outputs.version_clean }}_arm64.zip
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
