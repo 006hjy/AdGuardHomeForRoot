@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [arm64, armv7]
+        arch: [arm64]
     
     steps:
     - name: Checkout repository
