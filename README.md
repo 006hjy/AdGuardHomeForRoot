@@ -27,11 +27,24 @@
 
 ## 教程
 
-1. 前往 [Release](https://github.com/twoone-3/AdGuardHomeForRoot/releases/latest) 页面下载模块
+1. 前往 [Release](https://github.com/006hjy/AdGuardHomeForRoot/releases/latest) 页面下载模块
+   - ARM64 设备下载: AdGuardHomeForRoot_arm64.zip
+   - ARMv7 设备下载: AdGuardHomeForRoot_armv7.zip
 2. 检查 Android 设置 -> 网络和互联网 -> 高级 -> 私人 DNS，确保 `私人 DNS` 关闭
 3. 在 root 管理器中安装模块，重启设备
 4. 若看到模块运行成功的提示，则可以访问 <http://127.0.0.1:3000> 进入 AdGuardHome 后台，默认用户密码 root/root
 5. 若需高级使用教程和常见问题解答，请访问 [docs](/docs/index.md)。
+
+## 自动构建
+
+本项目使用 GitHub Actions 自动构建最新版本的 AdGuardHome。构建工作流会：
+
+- 每日自动检查 AdGuardHome 新版本
+- 支持手动触发构建
+- 同时构建 ARM64 和 ARMv7 架构
+- 自动创建 Release 并上传安装包
+
+如需了解构建流程详情，请查看 [.github/workflows/README.md](.github/workflows/README.md)。
 
 ## 鸣谢
 
