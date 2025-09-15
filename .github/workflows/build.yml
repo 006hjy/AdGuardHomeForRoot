@@ -135,6 +135,10 @@ jobs:
         # Verify the package was created
         ls -la "$PACKAGE_NAME"
         echo "Package created successfully: $PACKAGE_NAME"
+        
+        # Create a copy with generic name for easier downloading
+        cp "$PACKAGE_NAME" "AdGuardHomeForRoot_arm64.zip"
+        echo "Created generic copy: AdGuardHomeForRoot_arm64.zip"
 
     - name: Upload package as artifact
       uses: actions/upload-artifact@v4
@@ -177,7 +181,10 @@ jobs:
           For more details, see the [changelog](https://raw.githubusercontent.com/006hjy/AdGuardHomeForRoot/main/changelog.md).
         files: |
           AdGuardHomeForRoot_${{ steps.get_version.outputs.version_clean }}_arm64.zip
+          AdGuardHomeForRoot_arm64.zip
         draft: false
         prerelease: false
+        make_latest: true
+        generate_release_notes: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
