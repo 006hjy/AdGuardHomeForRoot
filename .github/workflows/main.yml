@@ -54,11 +54,8 @@ jobs:
         fi
         
         # Set architecture specific download URL
-        if [ "${{ matrix.arch }}" = "armv7" ]; then
-          DOWNLOAD_URL="https://github.com/AdguardTeam/AdGuardHome/releases/download/${TAG_NAME}/AdGuardHome_linux_armv7.tar.gz"
-        else
-          DOWNLOAD_URL="https://github.com/AdguardTeam/AdGuardHome/releases/download/${TAG_NAME}/AdGuardHome_linux_arm64.tar.gz"
-        fi
+        DOWNLOAD_URL="https://github.com/AdguardTeam/AdGuardHome/releases/download/${TAG_NAME}/AdGuardHome_linux_arm64.tar.gz"
+        
         
         echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
         echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
