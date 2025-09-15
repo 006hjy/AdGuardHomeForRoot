@@ -139,6 +139,36 @@ jobs:
         file src/bin/AdGuardHome
         du -h src/bin/AdGuardHome
     
+    - name: Update version to current date (UTC)
+      run: |
+        # Compute 8-digit UTC date YYYYMMDD
+        DATE=$(date -u +%Y%m%d)
+        echo "Using date version: $DATE"
+
+        # Update version.json -> "version": "YYYYMMDD"
+        if [ -f version.json ]; then
+          # Try to replace an 8-digit version first; fallback to any quoted value
+          sed -i -E "s/\"version\"\\s*:\\s*\"[0-9]{8}\"/\"version\": \"$DATE\"/" version.json || true
+          sed -i -E "s/\"version\"\\s*:\\s*\"[^\"]+\"/\"version\": \"$DATE\"/" version.json || true
+          echo "version.json after update:" && cat version.json
+        else
+          echo "version.json not found" >&2
+          exit 1
+        fi
+
+        # Update src/module.prop -> version=YYYYMMDD
+        if [ -f src/module.prop ]; then
+          if grep -q '^version=' src/module.prop; then
+            sed -i -E "s/^version=.*/version=$DATE/" src/module.prop
+          else
+            echo "version=$DATE" >> src/module.prop
+          fi
+          echo "src/module.prop version line:" && grep -n '^version=' src/module.prop || true
+        else
+          echo "src/module.prop not found" >&2
+          exit 1
+        fi
+    
     - name: Create release archive
       run: |
         # Create cache directory for output
