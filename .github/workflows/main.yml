@@ -21,8 +21,62 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       
+    - name: Check for new releases in last 24 hours
+      id: check_new_release
+      run: |
+        echo "Checking if there's a new AdGuardHome release in the last 24 hours..."
+        
+        # Get current timestamp and 24 hours ago timestamp
+        CURRENT_TIME=$(date +%s)
+        TIME_24H_AGO=$((CURRENT_TIME - 86400))
+        
+        # Fetch all releases (including pre-releases)
+        RELEASE_JSON=$(curl -s -f -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/AdguardTeam/AdGuardHome/releases" 2>/dev/null || echo "")
+        
+        if [ -z "$RELEASE_JSON" ] || [ "$RELEASE_JSON" = "null" ]; then
+          echo "Failed to fetch releases from API"
+          echo "has_new_release=false" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+        
+        # Check if any release was published in the last 24 hours
+        HAS_NEW_RELEASE=false
+        LATEST_RELEASE_TIME=""
+        
+        # Get the published_at timestamp of the latest release
+        LATEST_RELEASE_TIME=$(echo "$RELEASE_JSON" | jq -r '.[0].published_at' 2>/dev/null)
+        
+        if [ -n "$LATEST_RELEASE_TIME" ] && [ "$LATEST_RELEASE_TIME" != "null" ]; then
+          # Convert ISO 8601 timestamp to Unix timestamp
+          RELEASE_TIMESTAMP=$(date -d "$LATEST_RELEASE_TIME" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$LATEST_RELEASE_TIME" +%s 2>/dev/null)
+          
+          if [ -n "$RELEASE_TIMESTAMP" ]; then
+            echo "Latest release time: $LATEST_RELEASE_TIME"
+            echo "Latest release timestamp: $RELEASE_TIMESTAMP"
+            echo "24 hours ago timestamp: $TIME_24H_AGO"
+            
+            if [ "$RELEASE_TIMESTAMP" -gt "$TIME_24H_AGO" ]; then
+              HAS_NEW_RELEASE=true
+              echo "✅ New release found within the last 24 hours!"
+            else
+              echo "❌ No new release in the last 24 hours"
+              TIME_DIFF=$((CURRENT_TIME - RELEASE_TIMESTAMP))
+              HOURS_AGO=$((TIME_DIFF / 3600))
+              echo "Latest release was $HOURS_AGO hours ago"
+            fi
+          fi
+        fi
+        
+        echo "has_new_release=$HAS_NEW_RELEASE" >> $GITHUB_OUTPUT
+        
+        # If running on schedule and no new release, we'll skip the rest
+        if [ "${{ github.event_name }}" = "schedule" ] && [ "$HAS_NEW_RELEASE" = "false" ]; then
+          echo "⏭️ Skipping build as there's no new release in the last 24 hours"
+        fi
+      
     - name: Get latest AdGuardHome release
       id: get_release
+      if: steps.check_new_release.outputs.has_new_release == 'true' || github.event_name != 'schedule'
       run: |
         # Get the latest release (including pre-releases) from AdGuardHome repository
         echo "Fetching latest AdGuardHome release information..."
@@ -64,6 +118,7 @@ jobs:
         echo "Architecture: ${{ matrix.arch }}"
     
     - name: Download and extract AdGuardHome
+      if: steps.check_new_release.outputs.has_new_release == 'true' || github.event_name != 'schedule'
       run: |
         # Create temporary directory
         mkdir -p temp_extract
@@ -121,6 +176,7 @@ jobs:
         fi
     
     - name: Copy AdGuardHome binary to bin directory
+      if: steps.check_new_release.outputs.has_new_release == 'true' || github.event_name != 'schedule'
       run: |
         # Ensure bin directory exists
         mkdir -p src/bin
@@ -140,6 +196,7 @@ jobs:
         du -h src/bin/AdGuardHome
     
     - name: Create release archive
+      if: steps.check_new_release.outputs.has_new_release == 'true' || github.event_name != 'schedule'
       run: |
         # Create cache directory for output
         mkdir -p cache
@@ -157,6 +214,7 @@ jobs:
         unzip -l cache/AdGuardHomeForRoot_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}.zip
     
     - name: Upload build artifacts
+      if: steps.check_new_release.outputs.has_new_release == 'true' || github.event_name != 'schedule'
       uses: actions/upload-artifact@v4
       with:
         name: AdGuardHomeForRoot_${{ matrix.arch }}_${{ steps.get_release.outputs.tag_name }}
@@ -164,6 +222,7 @@ jobs:
         retention-days: 30
     
     - name: Clean up
+      if: steps.check_new_release.outputs.has_new_release == 'true' || github.event_name != 'schedule'
       run: |
         # Clean up temporary files
         rm -rf temp_extract
@@ -173,14 +232,52 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && needs.build.result == 'success'
     
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       
+    - name: Check for new releases in last 24 hours
+      id: check_new_release
+      run: |
+        echo "Checking if there's a new AdGuardHome release in the last 24 hours..."
+        
+        # Get current timestamp and 24 hours ago timestamp
+        CURRENT_TIME=$(date +%s)
+        TIME_24H_AGO=$((CURRENT_TIME - 86400))
+        
+        # Fetch all releases (including pre-releases)
+        RELEASE_JSON=$(curl -s -f -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/AdguardTeam/AdGuardHome/releases" 2>/dev/null || echo "")
+        
+        if [ -z "$RELEASE_JSON" ] || [ "$RELEASE_JSON" = "null" ]; then
+          echo "Failed to fetch releases from API"
+          echo "has_new_release=false" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+        
+        # Check if any release was published in the last 24 hours
+        HAS_NEW_RELEASE=false
+        
+        # Get the published_at timestamp of the latest release
+        LATEST_RELEASE_TIME=$(echo "$RELEASE_JSON" | jq -r '.[0].published_at' 2>/dev/null)
+        
+        if [ -n "$LATEST_RELEASE_TIME" ] && [ "$LATEST_RELEASE_TIME" != "null" ]; then
+          RELEASE_TIMESTAMP=$(date -d "$LATEST_RELEASE_TIME" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$LATEST_RELEASE_TIME" +%s 2>/dev/null)
+          
+          if [ -n "$RELEASE_TIMESTAMP" ] && [ "$RELEASE_TIMESTAMP" -gt "$TIME_24H_AGO" ]; then
+            HAS_NEW_RELEASE=true
+            echo "✅ New release found within the last 24 hours!"
+          else
+            echo "❌ No new release in the last 24 hours"
+          fi
+        fi
+        
+        echo "has_new_release=$HAS_NEW_RELEASE" >> $GITHUB_OUTPUT
+      
     - name: Get latest AdGuardHome release tag
       id: get_tag
+      if: steps.check_new_release.outputs.has_new_release == 'true' || github.event_name != 'schedule'
       run: |
         # Get the latest release tag (same logic as build job)
         RELEASE_JSON=$(curl -s -f -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/AdguardTeam/AdGuardHome/releases" 2>/dev/null || echo "")
@@ -210,6 +307,7 @@ jobs:
         echo "Using AdGuardHome release: $TAG_NAME"
     
     - name: Download artifacts
+      if: steps.check_new_release.outputs.has_new_release == 'true' || github.event_name != 'schedule'
       uses: actions/download-artifact@v4
       with:
         pattern: AdGuardHomeForRoot_*_${{ steps.get_tag.outputs.tag_name }}
@@ -217,6 +315,7 @@ jobs:
         merge-multiple: true
     
     - name: Create Release
+      if: steps.check_new_release.outputs.has_new_release == 'true' || github.event_name != 'schedule'
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -251,6 +350,7 @@ jobs:
         prerelease: false
     
     - name: Upload ARM64 Release Asset
+      if: steps.check_new_release.outputs.has_new_release == 'true' || github.event_name != 'schedule'
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
